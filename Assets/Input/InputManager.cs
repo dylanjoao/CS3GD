@@ -10,13 +10,18 @@ public class InputManager : MonoBehaviour
     public float verticalInput;
     public float horizontalInput;
 
+    public bool sprintPressed;
+    public bool jumpPressed;
+
     private void OnEnable()
     {
         if (playerControls == null)
         {
             playerControls = new PlayerControls();
 
-            playerControls.PlayerMovement.Movement.performed += i => movementInput = i.ReadValue<Vector2>();
+            playerControls.PlayerMovement.Movement.performed += ctx => movementInput = ctx.ReadValue<Vector2>();
+            playerControls.PlayerMovement.Sprint.performed += ctx => sprintPressed = ctx.ReadValueAsButton();
+            playerControls.PlayerMovement.Jump.performed += ctx => jumpPressed = ctx.ReadValueAsButton();
         }
 
         playerControls.Enable();
@@ -27,7 +32,6 @@ public class InputManager : MonoBehaviour
         playerControls.Disable();
     }
 
-
     public void HandleAllInputs()
     {
         HandleMovementInput();
@@ -37,5 +41,10 @@ public class InputManager : MonoBehaviour
     {
         verticalInput = movementInput.y;
         horizontalInput= movementInput.x;
+    }
+
+    private void Update()
+    {
+        HandleAllInputs();
     }
 }
