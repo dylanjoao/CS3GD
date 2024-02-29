@@ -7,9 +7,10 @@ using TMPro;
 using UnityEditor;
 #endif
 
+[RequireComponent(typeof(AwarenessSystem))]
 public class EnemyAI : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI FeedbackDisplay;
+    [SerializeField] TextMeshPro FeedbackDisplay;
 
     [SerializeField] float _VisionConeAngle = 60f;
     [SerializeField] float _VisionConeRange = 30f;
@@ -30,19 +31,52 @@ public class EnemyAI : MonoBehaviour
 
     public float CosVisionConeAngle { get; private set; } = 0f;
 
+    AwarenessSystem Awareness;
+
     void Awake()
     {
         CosVisionConeAngle = Mathf.Cos(VisionConeAngle * Mathf.Deg2Rad);
+        Awareness = GetComponent<AwarenessSystem>();
     }
 
-    public void ReportCanSee(DetectableTarget target)
+    public void ReportCanSee(DetectableTarget seen)
     {
-        Debug.Log("Can see " + target.gameObject.name);
+        Awareness.ReportCanSee(seen);
     }
 
     public void ReportInProximity(DetectableTarget target)
     {
-        Debug.Log(target.gameObject.name + "in direct proximity!");
+        Awareness.ReportInProximity(target);
+    }
+
+    public void OnSuspicious()
+    {
+        FeedbackDisplay.text = "I hear you";
+    }
+
+    public void OnDetected(GameObject target)
+    {
+        FeedbackDisplay.text = "I see you " + target.gameObject.name;
+    }
+
+    public void OnFullyDetected(GameObject target)
+    {
+        FeedbackDisplay.text = "Charge! " + target.gameObject.name;
+    }
+
+    public void OnLostDetect(GameObject target)
+    {
+        FeedbackDisplay.text = "Where are you " + target.gameObject.name;
+    }
+
+    public void OnLostSuspicion()
+    {
+        FeedbackDisplay.text = "Where did you go";
+    }
+
+    public void OnFullyLost()
+    {
+        FeedbackDisplay.text = "Must be nothing";
     }
 }
 
