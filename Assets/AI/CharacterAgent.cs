@@ -16,26 +16,33 @@ public class CharacterAgent : MonoBehaviour
 
     NavMeshAgent Agent;
     bool DestinationSet = false;
+    bool ReachedDestination = false;
     EOffmeshLinkStatus OffMeshLinkStatus = EOffmeshLinkStatus.NotStarted;
- 
-    void Start()
+
+    public bool IsMoving => Agent.velocity.magnitude > float.Epsilon;
+
+    public bool AtDestination => ReachedDestination;
+
+    // Start is called before the first frame update
+    protected void Start()
     {
         Agent = GetComponent<NavMeshAgent>();
     }
 
-    void Update()
+    // Update is called once per frame
+    protected void Update()
     {
-        // On path and near end
+        // have a path and near the end point?
         if (!Agent.pathPending && !Agent.isOnOffMeshLink && DestinationSet && (Agent.remainingDistance <= Agent.stoppingDistance))
         {
             DestinationSet = false;
-            Debug.Log("Destination REACHED!");
+            ReachedDestination = true;
         }
 
-        // is On OffMeshLink
+        // are we on an offmesh link?
         if (Agent.isOnOffMeshLink)
         {
-            // Update OffMeshLink Status and begin traversing
+            // have we started moving along the link
             if (OffMeshLinkStatus == EOffmeshLinkStatus.NotStarted)
                 StartCoroutine(FollowOffmeshLink());
         }
@@ -69,12 +76,26 @@ public class CharacterAgent : MonoBehaviour
         Agent.updateUpAxis = true;
     }
 
+    public Vector3 PickLocationInRange(float range)
+    {
+        Vector3 searchLocation = transform.position;
+        searchLocation += Random.Range(-range, range) * Vector3.forward;
+        searchLocation += Random.Range(-range, range) * Vector3.right;
+
+        NavMeshHit hitResult;
+        if (NavMesh.SamplePosition(searchLocation, out hitResult, NearestPointSearchRange, NavMesh.AllAreas))
+            return hitResult.position;
+
+        return transform.position;
+    }
+
     protected virtual void CancelCurrentCommand()
     {
         // clear the current path
         Agent.ResetPath();
 
         DestinationSet = false;
+        ReachedDestination = false;
         OffMeshLinkStatus = EOffmeshLinkStatus.NotStarted;
     }
 
@@ -93,6 +114,7 @@ public class CharacterAgent : MonoBehaviour
         {
             Agent.SetDestination(hitResult.position);
             DestinationSet = true;
+            ReachedDestination = false;
         }
     }
 }
