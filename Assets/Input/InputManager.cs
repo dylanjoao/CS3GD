@@ -12,7 +12,8 @@ public class InputManager : MonoBehaviour
 
     public bool sprintPressed;
     public bool jumpPressed;
-
+    public bool primaryAttackPressed;
+    
     private void OnEnable()
     {
         if (playerControls == null)
@@ -22,6 +23,7 @@ public class InputManager : MonoBehaviour
             playerControls.PlayerMovement.Movement.performed += ctx => movementInput = ctx.ReadValue<Vector2>();
             playerControls.PlayerMovement.Sprint.performed += ctx => sprintPressed = ctx.ReadValueAsButton();
             playerControls.PlayerMovement.Jump.performed += ctx => jumpPressed = ctx.ReadValueAsButton();
+            playerControls.PlayerMovement.PrimaryAttack.performed += ctx => primaryAttackPressed = ctx.ReadValueAsButton(); 
         }
 
         playerControls.Enable();

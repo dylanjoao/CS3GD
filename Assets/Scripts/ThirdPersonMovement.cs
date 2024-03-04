@@ -4,10 +4,17 @@ using UnityEngine;
 
 public class ThirdPersonMovement : MonoBehaviour
 {
+    #region References
     [Header("References")]
     CharacterController controller;
     InputManager inputManager;
-    
+    #endregion
+
+    #region Camera
+    public Cinemachine.AxisState xAxis, yAxis;
+    [SerializeField] Transform camFollowPos;
+    #endregion
+
     [Header("Movement")]
     Vector2 movement;
     public float walkSpeed;
@@ -35,6 +42,9 @@ public class ThirdPersonMovement : MonoBehaviour
 
     void Update()
     {
+        xAxis.Update(Time.deltaTime);
+        yAxis.Update(Time.deltaTime);
+
         isGrounded = Physics.CheckSphere(transform.position, .1f, 1);
 
         if (isGrounded && velocity.y < 0) {
@@ -73,4 +83,5 @@ public class ThirdPersonMovement : MonoBehaviour
         
         controller.Move(velocity * Time.deltaTime);
     }
+
 }
