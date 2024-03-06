@@ -50,14 +50,16 @@ public class EnemyAI : MonoBehaviour
 
     }
 
-    private void SearchWalkPoint()
+
+    public void SearchWalkPoint()
     {
-        float randZ = Random.Range(-walkPointRange, walkPointRange);
-        float randX = Random.Range(-walkPointRange, walkPointRange);
+        Vector3 searchLocation = transform.position;
+        searchLocation += Random.Range(-walkPointRange, walkPointRange) * Vector3.forward;
+        searchLocation += Random.Range(-walkPointRange, walkPointRange) * Vector3.right;
 
-        walkPoint = new Vector3(transform.position.x + randX, transform.position.y, transform.position.z + randZ);
-
-        if (Physics.Raycast(walkPoint, -transform.up, 2f, groundMask))
+        NavMeshHit hitResult;
+        if (NavMesh.SamplePosition(searchLocation, out hitResult, walkPointRange, NavMesh.AllAreas))
+            walkPoint = hitResult.position;
             walkPointSet = true;
     }
 
